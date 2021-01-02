@@ -1,0 +1,93 @@
+- debug:
+    var: service_path
+
+- name: Create directories
+  file:
+    path: "{{ service_path }}/{{ item }}"
+    state: directory
+    owner: "{{ account.user }}"
+    group: "{{ account.user }}"
+  loop:
+    - auth
+    - sites-available
+    - sites-enabled
+    - snippets
+    - ssl
+    - www
+  become: yes
+
+- name: Copy files
+  copy:
+    src: "{{ item.src }}"
+    dest: "{{ service_path }}/{{ item.dest }}"
+  loop:
+    - src: www/dhparam.pem
+      dest: ssl/dhparam.pem
+  notify:
+    - Restart Nginx
+
+- name: Template configuration
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ service_path }}/{{ item.dest }}"
+  loop:
+    - src: docker-compose.yml.j2
+      dest: docker-compose.yml
+    - src: nginx.conf.j2
+      dest: nginx.conf
+  notify:
+    - Restart Nginx
+
+- name: Create hosts
+  block:
+    - name: Template host configuration
+      template:
+        src: host.conf.j2
+        dest: "{{ service_path }}/sites-available/{{ item.primary }}"
+      loop: "{{ hosts }}"
+      notify:
+        - Restart Nginx
+
+    - name: Activate host
+      file:
+        src: ../sites-available/{{ item.primary }}
+        dest: "{{ service_path }}/sites-enabled/{{ item.primary }}"
+        state: link
+      loop: "{{ hosts }}"
+      notify:
+        - Restart Nginx
+
+    - name: Check for local files
+      local_action: stat path=www/{{ item.primary }}
+      loop: "{{ hosts }}"
+      register: local_www
+
+    - name: Copy static files if exists
+      copy:
+        src: www/{{ item.primary }}
+        dest: "{{ service_path }}/www/"
+      when: "'root' not in item and local_www.results[index].stat.exists"
+      loop: "{{ hosts }}"
+      loop_control:
+        index_var: index
+
+    - name: Ensure at least remote directory exists
+      file:
+        path: "{{ service_path }}/www/{{ item.primary }}"
+        state: directory
+      when: "'root' not in item and not local_www.results[index].stat.exists"
+      loop: "{{ hosts }}"
+      loop_control:
+        index_var: index
+
+- name: Install additional tools
+  package:
+    name: apache2-utils
+    state: present
+  become: yes
+
+- name: Start Nginx
+  community.general.docker_compose:
+    project_src: "{{ service_path }}"
+    state: present
+  become: yes
