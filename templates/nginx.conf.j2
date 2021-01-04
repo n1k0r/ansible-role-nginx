@@ -32,8 +32,13 @@ http {
         ''      close;
     }
 
+{% if ssl is defined %}
+    ssl_certificate /etc/ssl/cert;
+    ssl_certificate_key /etc/ssl/key;
+{% else %}
     ssl_certificate /etc/letsencrypt/live/{{ domain }}/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/{{ domain }}/privkey.pem;
+{% endif %}
     ssl_dhparam /etc/ssl/dhparam.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-256-GCM-SHA384:ECDHE:!COMPLEMENTOFDEFAULT;
