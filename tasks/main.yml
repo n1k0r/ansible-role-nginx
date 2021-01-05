@@ -1,14 +1,12 @@
-- debug:
-    var: service_path
-
 - name: Create directories
   file:
-    path: "{{ service_path }}/{{ item }}"
+    path: "{{ nginx_path }}/{{ item }}"
     state: directory
     owner: "{{ account.user }}"
     group: "{{ account.user }}"
   loop:
     - auth
+    - scripts
     - sites-available
     - sites-enabled
     - snippets
@@ -19,7 +17,7 @@
 - name: Copy files
   copy:
     src: "{{ item.src }}"
-    dest: "{{ service_path }}/{{ item.dest }}"
+    dest: "{{ nginx_path }}/{{ item.dest }}"
   loop:
     - src: www/dhparam.pem
       dest: ssl/dhparam.pem
@@ -28,22 +26,28 @@
 
 - name: Template configuration
   template:
-    src: "{{ item.src }}"
-    dest: "{{ service_path }}/{{ item.dest }}"
+    src: "{{ item }}.j2"
+    dest: "{{ nginx_path }}/{{ item }}"
   loop:
-    - src: docker-compose.yml.j2
-      dest: docker-compose.yml
-    - src: nginx.conf.j2
-      dest: nginx.conf
+    - docker-compose.yml
+    - nginx.conf
   notify:
     - Restart Nginx
+
+- name: Template scripts
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ nginx_path }}/scripts/{{ item }}"
+    mode: "755"
+  loop:
+    - reload.sh
 
 - name: Create hosts
   block:
     - name: Template host configuration
       template:
         src: host.conf.j2
-        dest: "{{ service_path }}/sites-available/{{ item.primary }}"
+        dest: "{{ nginx_path }}/sites-available/{{ item.primary }}"
       loop: "{{ hosts }}"
       notify:
         - Restart Nginx
@@ -51,7 +55,7 @@
     - name: Activate host
       file:
         src: ../sites-available/{{ item.primary }}
-        dest: "{{ service_path }}/sites-enabled/{{ item.primary }}"
+        dest: "{{ nginx_path }}/sites-enabled/{{ item.primary }}"
         state: link
       loop: "{{ hosts }}"
       notify:
@@ -65,7 +69,7 @@
     - name: Copy static files if exists
       copy:
         src: www/{{ item.primary }}
-        dest: "{{ service_path }}/www/"
+        dest: "{{ nginx_path }}/www/"
       when: "'root' not in item and local_www.results[index].stat.exists"
       loop: "{{ hosts }}"
       loop_control:
@@ -73,7 +77,7 @@
 
     - name: Ensure at least remote directory exists
       file:
-        path: "{{ service_path }}/www/{{ item.primary }}"
+        path: "{{ nginx_path }}/www/{{ item.primary }}"
         state: directory
       when: "'root' not in item and not local_www.results[index].stat.exists"
       loop: "{{ hosts }}"
@@ -88,6 +92,6 @@
 
 - name: Start Nginx
   community.general.docker_compose:
-    project_src: "{{ service_path }}"
+    project_src: "{{ nginx_path }}"
     state: present
   become: yes

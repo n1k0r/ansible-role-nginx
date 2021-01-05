@@ -1,0 +1,2 @@
+nginx_scripts:
+  reload: "{{ nginx_path }}/scripts/reload.sh"
