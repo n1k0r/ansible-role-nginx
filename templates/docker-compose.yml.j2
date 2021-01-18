@@ -7,32 +7,29 @@ services:
     network_mode: host
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./sites-available:/etc/nginx/sites-available
-      - ./sites-enabled:/etc/nginx/sites-enabled
-      - ./auth:/etc/nginx/auth
-      - ./snippets:/etc/nginx/snippets
-      - ./ssl:/etc/ssl
-      - ./www:/var/www
-      - /srv/certbot/config:/etc/letsencrypt
+      - ./conf.d:/etc/nginx/conf.d:ro
+      - ./ssl:/etc/ssl:ro
+      - ./www:/var/www:ro
+      - /srv/certbot/config:/etc/letsencrypt:ro
 
 {% if ssl is defined %}
-      - {{ ssl.cert }}:/etc/ssl/cert
-      - {{ ssl.key }}:/etc/ssl/key
+      - {{ ssl.cert }}:/etc/ssl/cert:ro
+      - {{ ssl.key }}:/etc/ssl/key:ro
 {% endif %}
 
 {% for host in hosts %}
 
 {% if "root" in host %}
-      - {{ host.root }}:/var/www-external/{{ host.primary }}
+      - {{ host.root }}:/var/www-external/{{ host.primary }}:ro
 {% endif %}
 
 {% if "locations" in host %}
 {% for location in host.locations %}
 {% if "root" in location %}
-      - {{ location.root }}:/var/www-external/{{ host.primary }}-{{ loop.index }}
+      - {{ location.root }}:/var/www-external/{{ host.primary }}-{{ loop.index }}:ro
 {% endif %}
 {% if "alias" in location %}
-      - {{ location.alias }}:/var/www-external/{{ host.primary }}-{{ loop.index }}
+      - {{ location.alias }}:/var/www-external/{{ host.primary }}-{{ loop.index }}:ro
 {% endif %}
 {% endfor %}
 {% endif %}

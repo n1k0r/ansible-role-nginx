@@ -5,11 +5,8 @@
     owner: "{{ account.user }}"
     group: "{{ account.user }}"
   loop:
-    - auth
+    - conf.d
     - scripts
-    - sites-available
-    - sites-enabled
-    - snippets
     - ssl
     - www
   become: yes
@@ -21,8 +18,7 @@
   loop:
     - src: www/dhparam.pem
       dest: ssl/dhparam.pem
-  notify:
-    - Restart Nginx
+  notify: Restart Nginx
 
 - name: Template configuration
   template:
@@ -31,8 +27,7 @@
   loop:
     - docker-compose.yml
     - nginx.conf
-  notify:
-    - Restart Nginx
+  notify: Restart Nginx
 
 - name: Template scripts
   template:
@@ -47,19 +42,9 @@
     - name: Template host configuration
       template:
         src: host.conf.j2
-        dest: "{{ nginx_path }}/sites-available/{{ item.primary }}"
+        dest: "{{ nginx_path }}/conf.d/{{ item.primary }}.conf"
       loop: "{{ hosts }}"
-      notify:
-        - Restart Nginx
-
-    - name: Activate host
-      file:
-        src: ../sites-available/{{ item.primary }}
-        dest: "{{ nginx_path }}/sites-enabled/{{ item.primary }}"
-        state: link
-      loop: "{{ hosts }}"
-      notify:
-        - Restart Nginx
+      notify: Restart Nginx
 
     - name: Check for local files
       local_action: stat path=www/{{ item.primary }}
@@ -75,7 +60,7 @@
       loop_control:
         index_var: index
 
-    - name: Ensure at least remote directory exists
+    - name: Ensure remote directory exists
       file:
         path: "{{ nginx_path }}/www/{{ item.primary }}"
         state: directory
@@ -83,6 +68,21 @@
       loop: "{{ hosts }}"
       loop_control:
         index_var: index
+
+- name: Clear hosts
+  block:
+    - name: Get list of configuration files
+      find:
+        paths: "{{ nginx_path }}/conf.d"
+      register: remote_conf
+
+    - name: Remove unnecessary configuration files
+      file:
+        path: "{{ item }}"
+        state: absent
+      when: item | basename not in hosts | map(attribute='primary') | product(['.conf']) | map('join')
+      loop: "{{ remote_conf.files | map(attribute='path') }}"
+      notify: Restart Nginx
 
 - name: Install additional tools
   package:
