@@ -13,12 +13,12 @@ services:
       - ./www:/var/www:ro
       - /srv/certbot/config:/etc/letsencrypt:ro
 
-{% if ssl is defined %}
-      - {{ ssl.cert }}:/etc/ssl/cert:ro
-      - {{ ssl.key }}:/etc/ssl/key:ro
+{% if "ssl" in nginx %}
+      - {{ nginx.ssl.cert }}:/etc/ssl/cert:ro
+      - {{ nginx.ssl.key }}:/etc/ssl/key:ro
 {% endif %}
 
-{% for host in hosts %}
+{% for host in nginx.hosts %}
 
 {% if "root" in host %}
       - {{ host.root }}:/var/www-external/{{ host.primary }}:ro

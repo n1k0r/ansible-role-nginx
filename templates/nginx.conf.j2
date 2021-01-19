@@ -32,7 +32,7 @@ http {
         ''      close;
     }
 
-{% if ssl is defined %}
+{% if "ssl" in nginx %}
     ssl_certificate /etc/ssl/cert;
     ssl_certificate_key /etc/ssl/key;
 {% else %}

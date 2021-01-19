@@ -42,7 +42,7 @@
   template:
     src: auth.conf.j2
     dest: "{{ nginx_path }}/auth/{{ item.name }}"
-  loop: "{{ auth_lists | default([]) }}"
+  loop: "{{ nginx.auth_lists | default([]) }}"
 
 - name: Clear auth lists
   block:
@@ -55,7 +55,7 @@
       file:
         path: "{{ item }}"
         state: absent
-      when: item | basename not in auth_lists | map(attribute='name')
+      when: item | basename not in nginx.auth_lists | map(attribute='name')
       loop: "{{ remote_auth.files | map(attribute='path') }}"
 
 - name: Create hosts
@@ -64,12 +64,12 @@
       template:
         src: host.conf.j2
         dest: "{{ nginx_path }}/conf.d/{{ item.primary }}.conf"
-      loop: "{{ hosts }}"
+      loop: "{{ nginx.hosts }}"
       notify: Restart Nginx
 
     - name: Check for local files
       local_action: stat path=www/{{ item.primary }}
-      loop: "{{ hosts }}"
+      loop: "{{ nginx.hosts }}"
       register: local_www
 
     - name: Copy static files if exists
@@ -77,7 +77,7 @@
         src: www/{{ item.primary }}
         dest: "{{ nginx_path }}/www/"
       when: "'root' not in item and local_www.results[index].stat.exists"
-      loop: "{{ hosts }}"
+      loop: "{{ nginx.hosts }}"
       loop_control:
         index_var: index
 
@@ -86,7 +86,7 @@
         path: "{{ nginx_path }}/www/{{ item.primary }}"
         state: directory
       when: "'root' not in item and not local_www.results[index].stat.exists"
-      loop: "{{ hosts }}"
+      loop: "{{ nginx.hosts }}"
       loop_control:
         index_var: index
 
@@ -101,7 +101,7 @@
       file:
         path: "{{ item }}"
         state: absent
-      when: item | basename not in hosts | map(attribute='primary') | product(['.conf']) | map('join')
+      when: item | basename not in nginx.hosts | map(attribute='primary') | product(['.conf']) | map('join')
       loop: "{{ remote_conf.files | map(attribute='path') }}"
       notify: Restart Nginx
 
