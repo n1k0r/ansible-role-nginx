@@ -1,0 +1,4 @@
+{% for record in item.users %}
+{{ record.username }}:{% if "password_hash" in record %}{{ record.password_hash | regex_replace("^\$2[a-z]\$(.*)$", "$2a$\\1") }}{% else %}{{ record.password | password_hash("bcrypt", record.salt) | regex_replace("^\$2[a-z]\$(.*)$", "$2a$\\1") }}{% endif %}
+
+{% endfor %}

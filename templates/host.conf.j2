@@ -8,9 +8,23 @@ server {
     root /var/www-external/{{ item.primary }};
 {% endif %}
 
+{% if "auth" in item %}
+{% if "msg" in item.auth %}
+    auth_basic "{{ item.auth.msg }}";
+{% endif %}
+    auth_basic_user_file auth/{{ item.auth.list }};
+{% endif %}
+
 {% if "locations" in item %}
 {% for location in item.locations %}
     location {{ location.url }} {
+
+{% if "auth" in location %}
+{% if "msg" in location.auth %}
+        auth_basic "{{ location.auth.msg }}";
+{% endif %}
+        auth_basic_user_file auth/{{ location.auth.list }};
+{% endif %}
 
 {% if "root" in location %}
         root /var/www-external/{{ item.primary }}-{{ loop.index }};

@@ -5,6 +5,15 @@
 ```yaml
 domain: domain.name
 
+auth_lists:
+  - name: developers
+    users:
+      - username: developer1
+        password_hash: $2b$12$012345678901234567890uOwS8BfAL92NYwRa7Ld2G.qrpL9qOR.S
+      - username: developer2
+        password: q1w2e3r4
+        salt: "0123456789012345678901" # bcrypt requires exactly 22 chars for salt
+
 hosts:
   - primary: domain.name
     aliases:
@@ -12,6 +21,9 @@ hosts:
     default: yes
 
   - primary: "{{ app.domain }}"
+    auth:
+      msg: "Auth required!"
+      list: developers
     root: "{{ services_path }}/app/front"
     locations:
       - url: /api
@@ -20,6 +32,9 @@ hosts:
   - primary: "{{ service.domain }}"
     locations:
       - url: /
+        auth:
+          msg: "Auth required!!1"
+          list: developers
         proxy: "{{ service.internal_port }}"
         proxy_ws: yes
       - url: = /robots.txt

@@ -5,6 +5,7 @@
     owner: "{{ account.user }}"
     group: "{{ account.user }}"
   loop:
+    - auth
     - conf.d
     - scripts
     - ssl
@@ -36,6 +37,26 @@
     mode: "755"
   loop:
     - reload.sh
+
+- name: Template auth list
+  template:
+    src: auth.conf.j2
+    dest: "{{ nginx_path }}/auth/{{ item.name }}"
+  loop: "{{ auth_lists | default([]) }}"
+
+- name: Clear auth lists
+  block:
+    - name: Get list of auth lists
+      find:
+        paths: "{{ nginx_path }}/auth"
+      register: remote_auth
+
+    - name: Remove unnecessary auth lists
+      file:
+        path: "{{ item }}"
+        state: absent
+      when: item | basename not in auth_lists | map(attribute='name')
+      loop: "{{ remote_auth.files | map(attribute='path') }}"
 
 - name: Create hosts
   block:
