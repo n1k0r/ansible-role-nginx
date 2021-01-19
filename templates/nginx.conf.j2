@@ -36,7 +36,7 @@ http {
     ssl_certificate /etc/ssl/cert;
     ssl_certificate_key /etc/ssl/key;
 {% endif %}
-    ssl_dhparam /etc/ssl/dhparam.pem;
+    ssl_dhparam /etc/ssl/static/dhparam.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
     ssl_ciphers TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-256-GCM-SHA384:ECDHE:!COMPLEMENTOFDEFAULT;
     ssl_prefer_server_ciphers on;
