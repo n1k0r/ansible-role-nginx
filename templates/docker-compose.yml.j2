@@ -11,7 +11,6 @@ services:
       - ./auth:/etc/nginx/auth:ro
       - ./ssl:/etc/ssl:ro
       - ./www:/var/www:ro
-      - /srv/certbot/config:/etc/letsencrypt:ro
 
 {% if "ssl" in nginx %}
       - {{ nginx.ssl.cert }}:/etc/ssl/cert:ro

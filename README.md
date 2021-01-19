@@ -6,6 +6,10 @@
 domain: domain.name
 
 nginx:
+  ssl:
+    cert: "{{ certbot_cert_prefix }}{{ domain }}{{ certbot_cert_suffix }}"
+    key: "{{ certbot_key_prefix }}{{ domain }}{{ certbot_key_suffix }}"
+
   auth_lists:
     - name: developers
       users:
