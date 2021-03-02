@@ -6,7 +6,7 @@ include {{ nginx_path }}/modules-enabled/*.conf;
 events {
     worker_connections 4096;
     use epoll;
-	multi_accept on;
+    multi_accept on;
 }
 
 http {
@@ -14,8 +14,8 @@ http {
                     '"$request" $status $body_bytes_sent '
                     '"$http_referer" "$http_user_agent" "$host"';
 
-	access_log /var/log/nginx/access.log main;
-	error_log  /var/log/nginx/error.log;
+    access_log /var/log/nginx/access.log main;
+    error_log  /var/log/nginx/error.log;
 
     include {{ nginx_path }}/mime.types;
     default_type application/octet-stream;
