@@ -29,7 +29,7 @@ nginx:
       auth:
         msg: "Auth required!"
         list: developers
-      root: "{{ services_path }}/app/front"
+      root: /srv/app/front
       locations:
         - url: /api
           proxy: "{{ app.internal_port }}"
@@ -43,7 +43,10 @@ nginx:
           proxy: "{{ service.internal_port }}"
           proxy_ws: yes
         - url: = /robots.txt
-          root: "{{ services_path }}/service"
+          root: /srv/service
+
+    - primary: "{{ app.domain }}" # only used for name of config file
+      link: /srv/app/server.conf
 ```
 
 ## Files

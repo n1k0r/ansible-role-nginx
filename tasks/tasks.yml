@@ -58,6 +58,16 @@
       template:
         src: host.conf.j2
         dest: "{{ nginx_path }}/conf.d/{{ item.primary }}.conf"
+      when: "'link' not in item"
+      loop: "{{ nginx.hosts }}"
+      notify: Restart Nginx
+
+    - name: Create links to host configuration
+      file:
+        src: "{{ item.link }}"
+        path: "{{ nginx_path }}/conf.d/{{ item.primary }}.conf"
+        state: link
+      when: "'link' in item"
       loop: "{{ nginx.hosts }}"
       notify: Restart Nginx
 
@@ -80,7 +90,7 @@
       file:
         path: "/var/www/{{ item.primary }}"
         state: directory
-      when: "'root' not in item and not local_www.results[index].stat.exists"
+      when: "'root' not in item and 'link' not in item and not local_www.results[index].stat.exists"
       loop: "{{ nginx.hosts }}"
       loop_control:
         index_var: index
