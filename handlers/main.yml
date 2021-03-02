@@ -1,6 +1,5 @@
 - name: Restart Nginx
-  community.general.docker_compose:
-    project_src: "{{ nginx_path }}"
-    state: present
-    restarted: yes
+  service:
+    name: nginx
+    state: reloaded
   become: yes

@@ -46,8 +46,6 @@ nginx:
           root: "{{ services_path }}/service"
 ```
 
-Account dictionary is also expected: https://gitlab.com/n1k0r-ansible/roles/master
-
 ## Files
 
 Your project folder should contain these files:

@@ -1,4 +1,11 @@
 {% for record in item.users %}
-{{ record.username }}:{% if "password_hash" in record %}{{ record.password_hash | regex_replace("^\$2[a-z]\$(.*)$", "$2a$\\1") }}{% else %}{{ record.password | password_hash("bcrypt", record.salt) | regex_replace("^\$2[a-z]\$(.*)$", "$2a$\\1") }}{% endif %}
+{% if "password_hash" in record %}
 
+{{ record.username }}:{{ record.password_hash | regex_replace("^\$2[a-z]\$(.*)$", "$2a$\\1") }}
+
+{% else %}
+
+{{ record.username }}:{{ record.password | password_hash("md5", record.salt) | regex_replace("^\$2[a-z]\$(.*)$", "$2a$\\1") }}
+
+{% endif %}
 {% endfor %}

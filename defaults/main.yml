@@ -1,2 +1,0 @@
-nginx_service_dir: nginx
-nginx_path: "{{ services_path }}/{{ nginx_service_dir }}"
