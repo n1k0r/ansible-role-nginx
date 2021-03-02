@@ -17,7 +17,7 @@ nginx:
           password_hash: $2b$12$012345678901234567890uOwS8BfAL92NYwRa7Ld2G.qrpL9qOR.S
         - username: developer2
           password: q1w2e3r4
-          salt: "0123456789012345678901" # bcrypt requires exactly 22 chars for salt
+          salt: "01234567" # md5 requires no more than 8 chars for salt
 
   hosts:
     - primary: domain.name
