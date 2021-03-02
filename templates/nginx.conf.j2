@@ -33,12 +33,12 @@ http {
     client_max_body_size 64M;
     server_tokens off;
 
-{% if "ssl" in nginx %}
+{% if nginx.ssl.cert is defined and nginx.ssl.key is defined %}
     ssl_certificate {{ nginx.ssl.cert }};
     ssl_certificate_key {{ nginx.ssl.key }};
 {% endif %}
     ssl_dhparam {{ nginx_path }}/dhparam.pem;
-    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_protocols TLSv1.2 {% if nginx.ssl.tls13 is not defined or nginx.ssl.tls13 %}TLSv1.3{% endif %};
     ssl_ciphers TLS13-CHACHA20-POLY1305-SHA256:TLS13-AES-128-GCM-SHA256:TLS13-AES-256-GCM-SHA384:ECDHE:!COMPLEMENTOFDEFAULT;
     ssl_prefer_server_ciphers on;
     ssl_session_cache shared:SSL:10m;
