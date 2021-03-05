@@ -67,6 +67,7 @@
         src: "{{ item.link }}"
         path: "{{ nginx_path }}/conf.d/{{ item.primary }}.conf"
         state: link
+        force: yes
       when: "'link' in item"
       loop: "{{ nginx.hosts }}"
       notify: Restart Nginx
