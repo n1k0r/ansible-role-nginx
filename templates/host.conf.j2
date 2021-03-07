@@ -13,6 +13,8 @@ server {
     ssl_certificate_key {{ item.ssl.key }};
 {% endif %}
 
+    include snippets/acme-challenge.conf;
+
 {% if "auth" in item %}
   {% if "msg" in item.auth %}
     auth_basic "{{ item.auth.msg }}";

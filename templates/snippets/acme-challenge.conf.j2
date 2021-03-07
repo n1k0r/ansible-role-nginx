@@ -1,0 +1,6 @@
+{% if nginx.ssl.acme_webroot is defined %}
+location ^~ /.well-known/acme-challenge/ {
+    auth_basic off;
+    root {{ nginx.ssl.acme_webroot }};
+}
+{% endif %}

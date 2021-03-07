@@ -7,8 +7,9 @@ domain: domain.name
 
 nginx:
   ssl:
-    cert: "{{ certbot_cert }}"
-    key: "{{ certbot_key }}"
+    cert: "{{ certbot_cert | format("example.com") }}"
+    key: "{{ certbot_key | format("example.com") }}"
+    acme-webroot: "/var/www/acme-challenge/"
 
   auth_lists:
     - name: developers
@@ -35,6 +36,9 @@ nginx:
           proxy: "{{ app.internal_port }}"
 
     - primary: "{{ service.domain }}"
+      ssl:
+        cert: "{{ certbot_cert | format("example2.com") }}"
+        key: "{{ certbot_key | format("example2.com") }}"
       locations:
         - url: /
           auth:
@@ -45,7 +49,7 @@ nginx:
         - url: = /robots.txt
           root: /srv/service
 
-    - primary: "{{ app.domain }}" # only used for name of config file
+    - primary: "{{ another_app.domain }}" # only used for name of config file
       link: /srv/app/server.conf
 ```
 

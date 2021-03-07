@@ -117,6 +117,14 @@
       loop: "{{ remote_conf.files | map(attribute='path') }}"
       notify: Restart Nginx
 
+- name: Template snippets
+  template:
+    src: snippets/{{ item }}.conf.j2
+    dest: "{{ nginx_path }}/snippets/{{ item }}.conf"
+  loop:
+    - acme-challenge
+  notify: Restart Nginx
+
 - name: Install additional tools
   package:
     name:
