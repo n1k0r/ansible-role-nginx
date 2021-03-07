@@ -8,6 +8,11 @@ server {
     root {{ item.root }};
 {% endif %}
 
+{% if item.ssl.cert is defined and item.ssl.key is defined %}
+    ssl_certificate {{ item.ssl.cert }};
+    ssl_certificate_key {{ item.ssl.key }};
+{% endif %}
+
 {% if "auth" in item %}
   {% if "msg" in item.auth %}
     auth_basic "{{ item.auth.msg }}";
