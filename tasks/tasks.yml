@@ -3,6 +3,11 @@
     name: nginx-extras
     state: present
 
+- name: Install ssl-cert package for self-signed certificate
+  package:
+    name: ssl-cert
+    state: present
+
 - name: Create directories
   file:
     path: "{{ nginx_path }}/{{ item }}"

@@ -36,6 +36,9 @@ http {
 {% if nginx.ssl.cert is defined and nginx.ssl.key is defined %}
     ssl_certificate {{ nginx.ssl.cert }};
     ssl_certificate_key {{ nginx.ssl.key }};
+{% else %}
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
 {% endif %}
     ssl_dhparam {{ nginx_path }}/dhparam.pem;
     ssl_protocols TLSv1.2 {% if nginx.ssl.tls13 is not defined or nginx.ssl.tls13 %}TLSv1.3{% endif %};
