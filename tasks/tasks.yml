@@ -58,6 +58,7 @@
       loop: "{{ remote_auth.files | map(attribute='path') }}"
 
 - name: Create hosts
+  when: nginx.hosts is defined
   block:
     - name: Template host configuration
       template:
