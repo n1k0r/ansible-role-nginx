@@ -125,6 +125,13 @@
     - acme-challenge
   notify: Restart Nginx
 
+# https://bugs.launchpad.net/ubuntu/+source/perl/+bug/1897561
+- name: Disable Perl module
+  file:
+    path: "{{ nginx_path }}/modules-enabled/50-mod-http-perl.conf"
+    state: absent
+  notify: Restart Nginx
+
 - name: Install additional tools
   package:
     name:
