@@ -3,13 +3,11 @@
 ## Variables
 
 ```yaml
-domain: domain.name
-
 nginx:
   ssl:
     cert: "{{ certbot_cert | format("example.com") }}"
     key: "{{ certbot_key | format("example.com") }}"
-    acme-webroot: "/var/www/acme-challenge/"
+    acme_webroot: "/var/www/acme-challenge/"
 
   auth_lists:
     - name: developers
