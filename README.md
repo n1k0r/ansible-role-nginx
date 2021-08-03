@@ -5,8 +5,8 @@
 ```yaml
 nginx:
   ssl:
-    cert: "{{ certbot_cert | format("example.com") }}"
-    key: "{{ certbot_key | format("example.com") }}"
+    cert: "{{ certbot_cert | format('example.com') }}"
+    key: "{{ certbot_key | format('example.com') }}"
     acme_webroot: "/var/www/acme-challenge/"
 
   auth_lists:
