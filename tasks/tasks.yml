@@ -140,6 +140,13 @@
       - ssl-cert
     state: present
 
+- name: Fix logrotate
+  lineinfile:
+    path: /etc/logrotate.d/nginx
+    insertafter: "{"
+    regex: "copytruncate"
+    line: "\tcopytruncate"
+
 - name: Enable Nginx
   service:
     name: nginx
