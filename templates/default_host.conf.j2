@@ -84,6 +84,12 @@ server {
     {% endif %}
   {% endfor %}
 {% endif %}
+
+{%- block server_extra %}
+{% if item.server_extra is defined %}
+    {{ item.server_extra }}
+{% endif %}
+{% endblock %}
 }
 
 {% if "aliases" in item %}
