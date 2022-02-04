@@ -62,7 +62,7 @@
   block:
     - name: Template host configuration
       template:
-        src: host.conf.j2
+        src: "{{ item.template|default('default_host.conf.j2') }}"
         dest: "{{ nginx_path }}/conf.d/{{ item.primary }}.conf"
       when: "'link' not in item"
       loop: "{{ nginx.hosts }}"

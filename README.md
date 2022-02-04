@@ -37,6 +37,7 @@ nginx:
       ssl:
         cert: "{{ certbot_cert | format("example2.com") }}"
         key: "{{ certbot_key | format("example2.com") }}"
+      template: website.conf.j2 # optional - overrides default host template
       locations:
         - url: /
           auth:
