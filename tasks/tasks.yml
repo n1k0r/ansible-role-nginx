@@ -54,7 +54,7 @@
       file:
         path: "{{ item }}"
         state: absent
-      when: item | basename not in nginx.auth_lists | map(attribute='name')
+      when: item | basename not in nginx.auth_lists | default([]) | map(attribute='name')
       loop: "{{ remote_auth.files | map(attribute='path') }}"
 
 - name: Create hosts
