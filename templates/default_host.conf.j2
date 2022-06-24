@@ -26,6 +26,10 @@ server {
   {% for location in item.locations %}
     location {{ location.url }} {
 
+    {% if "extra" in location %}
+        {{ location.extra }}
+    {% endif -%}
+
     {% if "auth" in location %}
       {% if "msg" in location.auth %}
         auth_basic "{{ location.auth.msg }}";

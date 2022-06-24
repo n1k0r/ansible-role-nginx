@@ -53,5 +53,8 @@ http {
         ''      close;
     }
 
+{% if "http_extra" in nginx %}
+    {{ nginx.http_extra | indent }}
+{% endif %}
     include {{ nginx_path }}/conf.d/*.conf;
 }
